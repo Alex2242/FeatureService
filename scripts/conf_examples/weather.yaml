@@ -1,0 +1,31 @@
+input:
+  # scheme could be local or hdfs
+  scheme: local
+  local:
+    # csv or json
+    path: data_examples/weather.csv
+  hdfs:
+    ip: 127.0.0.1
+    port: 50070
+    path: /fft.json
+
+
+output:
+  # scheme could be local or hdfs
+  scheme: local
+  local:
+    # json
+    path: weather.json
+  hdfs:
+    ip: 127.0.0.1
+    port: 9200
+    index: ebdo
+
+
+Converter:
+  "Latitude": latitude
+  "Longitude": longitude
+  "Time of Observation": timestamp
+  "Wind Speed": wind_speed
+  "Wind Direction": wind_direction
+  "Sea Surface Temperature": sea_surface_temperature
