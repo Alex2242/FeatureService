@@ -15,7 +15,7 @@
  */
 
 /*
- * EBDO-FeatureService Seqrch functions
+ * EBDO-FeatureService Search functions
  * Author:
  */
 'use strict';
@@ -23,137 +23,64 @@
 var HyperSwitch = require('hyperswitch');
 const URI = HyperSwitch.URI;
 var path = require('path');
-var fsUtil = require('../lib/FeatureServiceUtil');
-
-var spec = HyperSwitch.utils.loadSpec(path.join(__dirname, 'examples.yaml'));
-
+const HTTPError = HyperSwitch.HTTPError;
+var spec = HyperSwitch.utils.loadSpec(path.join(__dirname, 'search.yaml'));
 
 
 
-
-const STEP_TO_SECONDS = {
-    second:    1,
-    minute:   60,
-    hour:   3600,
-    day:   86400
-};
-
-
-
-class ExampleOfTimeserieTreament {
-    // Class that handles timeseries requests
+class ESSearches {
+    // Class meant to provide internal endpoints able to query Elasticsearch
 
     constructor(options) {
         this.options = options;
         this.elastic_search = options.elastic_search;
+
     }
 
-    function requestURI(elastic_search) {
+    requestURI(elastic_search) {
+        // Generate an incomplete uri that points to Elasticsearch
         if (elastic_search) {
             const scheme = (elastic_search.scheme) ? `${elastic_search.scheme}://` : '';
             const host = elastic_search.host || '';
             const port = (elastic_search.port) ? `:${elastic_search.port}` : '';
-            const index = elastic_search.index || '';
 
-            return `${scheme}${host}${port}/${index}`;
+            return `${scheme}${host}${port}`;
         } else { // Fail with 500 if elastic_search conf is not set
             throw new HTTPError({
                 status: 500,
                 body: {
                     type: 'internal_error',
-                    detail: 'Druid configuration not set',
+                    detail: 'Elasticsearch configuration not set',
                 }
             });
         }
     }
 
 
-    fakeTimeserie(hyper, req) {
-        var requestParams = req.params;
-        let uri = this.requestURI(this.elastic_search);
-        fsUtil.validateFromAndTo(requestParams);
-
-        var fromDate = requestParams.fromDate;
-        var intervalSeconds = (requestParams.toDate - fromDate) / 1000;
-        var stepSeconds = STEP_TO_SECONDS[requestParams.step];
-
-        if (stepSeconds > intervalSeconds) {
-            fsUtil.throwIfNeeded('Step should be smaller than [from, to[ interval');
-        }
-
-        var stepNumbers = intervalSeconds / stepSeconds;
-
-        return fsUtil.normalizeResponse({
-            status: 200,
-            body: {
-                items: [...Array(stepNumbers).keys()].map(idx => {
-                    return {
-                        ts: (new Date(fromDate.getTime() +
-                            (idx * stepSeconds * 1000))).toISOString(),
-                        val: Math.random()
-                    };
-                })
-            }
-        });
-    }
-
-
-    meanTimeserie(hyper, req) {
-        // Returns mean of the timeserie specified in the request
+    emptySearch(hyper, req) {
+        // Requests Elasticsearch with an empty search at a given index
+        // ie : gets all documents at the given index
 
         var requestParams = req.params;
-        fsUtil.validateFromAndTo(requestParams);
 
-        // Build the uri used to request the timeserie
-        const uriFakeTS = new URI([requestParams.domain, 'sys', 'examples',
-            'fake-timeserie',requestParams.from,
-            requestParams.to,requestParams.step]);
+        // Create an incomplete uri which points to Elasticsearch
+        const emptyUri = this.requestURI(this.elastic_search);
 
-        var response = fsUtil.normalizeResponse({
-                status: 200,
-                body: {
-                    items: {
-                        startts: requestParams.fromDate,
-                        endts: requestParams.toDate,
-                        length: -1,
-                        mean: -1 // return the mean in the response
-                    }
-                }
-            });
+        // Complete the uri with the search request
+        const searchUri = emptyUri + '/' + requestParams.index + '/_search';
 
-        /*
-        return hyper.get({ uri: uriFakeTS }).then((res) => {
-                    res.status = 200;
-                    res.body = { items: {
-                        startts: requestParams.fromDate,
-                        endts: requestParams.toDate,
-                        length: res.body.items.length,
-                        mean: res.body.items.map(items => items.val).
-                            reduce((prev, next) => prev + next, 0) / res.body.items.length
-                        }};
-                }
-            );*/
-
-        // Request the timeserie, wait for the response and modify the response
-        // in order to put the correct values in it.
-        hyper.get({ uri: uriFakeTS }).then((res) => {
-                response.body.items.mean = res.body.items.map(items => items.val).
-                    reduce((prev, next) => prev + next, 0) / res.body.items.length;
-                response.body.items.length = res.body.items.length;
-            });
-
-        return response;
+        // return Elasticsearch response (this needs modifications)
+        return hyper.get({ uri: searchUri });
     }
 }
 
 module.exports = function(options) {
-    var tst = new ExampleOfTimeserieTreament(options);
+    var ess = new ESSearchs(options);
 
     return {
         spec: spec,
         operations: {
-            fakeTimeserie: tst.fakeTimeserie.bind(tst),
-            meanTimeserie: tst.meanTimeserie.bind(tst)
+            emptySearch: ess.emptySearch.bind(ess)
         }
     };
 };
