@@ -3,7 +3,7 @@ input:
   scheme: local
   local:
     # csv or json
-    path: data_examples/weather.csv
+    path: data_examples/WeatherBuoy_NOAA.csv
   hdfs:
     ip: 127.0.0.1
     port: 50070
@@ -15,7 +15,7 @@ output:
   scheme: local
   local:
     # json
-    path: weather.json
+    path: output_examples/weather.json
   hdfs:
     ip: 127.0.0.1
     port: 9200

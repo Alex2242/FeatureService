@@ -1,0 +1,17 @@
+input:
+  # scheme could be local or hdfs
+  scheme: local
+  local:
+    # csv or json
+    path: data_examples/backend_output_V2.json
+
+output:
+  # scheme could be local or hdfs
+  scheme: local
+  local:
+    # json
+    path: output_examples/backend_V2.json
+
+Converter:
+  "timestamp": timestamp
+  "TOB": TOB
