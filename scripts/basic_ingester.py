@@ -97,11 +97,15 @@ for timestamp in source.AvailableTimestamp():
 
 
     for ValueName in source.AvailableValueName():
+
         # type conversion will be done here
         value = source.GetValue(timestamp, ValueName)
         # For now, remove spaces if type is str (basic conversion)
         if type(value) == str:
-            value.strip()
+            value = value.strip()
+	# If value is empty, set to None
+        if len(value) == 0:
+            value = None
 
         try:
             ConverterValueName = config['Converter'][ValueName]
