@@ -75,7 +75,7 @@ class ESSearches {
 }
 
 module.exports = function(options) {
-    var ess = new ESSearchs(options);
+    var ess = new ESSearches(options);
 
     return {
         spec: spec,
