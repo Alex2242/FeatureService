@@ -102,13 +102,13 @@ class Example {
 }
 
 module.exports = function(options) {
-    var tst = new Example(options);
+    var ex = new Example(options);
 
     return {
         spec: spec,
         operations: {
-            fakeTimeserie: tst.fakeTimeserie.bind(tst),
-            meanTimeserie: tst.meanTimeserie.bind(tst)
+            fakeTimeserie: ex.fakeTimeserie.bind(ex),
+            meanTimeserie: ex.meanTimeserie.bind(ex)
         }
     };
 };
