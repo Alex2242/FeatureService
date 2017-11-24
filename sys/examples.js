@@ -36,7 +36,7 @@ const STEP_TO_SECONDS = {
 
 
 
-class ExampleOfTimeserieTreament {
+class Example {
     // Class that handles timeseries requests
 
     constructor(options) {
@@ -102,13 +102,13 @@ class ExampleOfTimeserieTreament {
 }
 
 module.exports = function(options) {
-    var tst = new ExampleOfTimeserieTreament(options);
+    var ex = new Example(options);
 
     return {
         spec: spec,
         operations: {
-            fakeTimeserie: tst.fakeTimeserie.bind(tst),
-            meanTimeserie: tst.meanTimeserie.bind(tst)
+            fakeTimeserie: ex.fakeTimeserie.bind(ex),
+            meanTimeserie: ex.meanTimeserie.bind(ex)
         }
     };
 };
