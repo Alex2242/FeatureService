@@ -28,7 +28,7 @@ var spec = HyperSwitch.utils.loadSpec(path.join(__dirname, 'search.yaml'));
 
 
 
-class ESSearches {
+class Search {
     // Class meant to provide internal endpoints able to query Elasticsearch
 
     constructor(options) {
@@ -75,12 +75,12 @@ class ESSearches {
 }
 
 module.exports = function(options) {
-    var ess = new ESSearches(options);
+    var search = new Search(options);
 
     return {
         spec: spec,
         operations: {
-            emptySearch: ess.emptySearch.bind(ess)
+            emptySearch: search.emptySearch.bind(search)
         }
     };
 };
