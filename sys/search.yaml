@@ -19,7 +19,7 @@
 
 
 paths:
-    /empty-search/{index}:
+    /get-all/{index}:
         get:
           summary: Get all documents at given index
-          operationId: emptySearch
+          operationId: getAll
