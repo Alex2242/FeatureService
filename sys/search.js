@@ -67,7 +67,8 @@ class Search {
         const emptyUri = this.requestURI(this.elastic_search);
 
         // Complete the uri with the search request
-        const searchUri = emptyUri + '/' + requestParams.index + '/_search';
+        var j = {"query": { "match_all": {} }};
+        const searchUri = emptyUri + '/' + requestParams.index + '/_search?source_content_type=application/json&source='+ JSON.stringify(j);
 
         // return Elasticsearch response (this needs modifications)
         return hyper.get({ uri: searchUri });
