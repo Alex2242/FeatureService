@@ -83,6 +83,47 @@ paths:
               uri: /{domain}/sys/search/get-all/{index}
       x-monitor: false
 
+  /range-query/{index}/{from}/{to}:
+    get:
+      tags:
+        - EBDO FeatureService search
+      summary: Get a fake timeserie
+      description: |
+        Get all documents from an Elasticsearch index
+      produces:
+        - application/json
+      parameters:
+        - name: index
+          in: path
+          description: The index of Elasticsearch to search the documents from.
+          type: string
+          required: true
+        - name: from
+          in: path
+          description: Start of the wanted time range. Expecting YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS formats.
+          type: string
+          required: true
+        - name: to 
+          in: path
+          description: End of the wanted time range. Expecting YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS formats.
+          type: string
+          required: true
+      responses:
+        '200':
+          description: The documents within the time range at the given index.
+          # the two lines that follows must be uncommented asap, ie define the form of the response
+          #schema:
+          #  $ref: '#/definitions/get-all'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
+      x-request-handler:
+        - get_from_backend:
+            request:
+              uri: /{domain}/sys/search/range-query/{index}/{from}/{to}
+      x-monitor: false
+
 definitions:
   # A https://tools.ietf.org/html/draft-nottingham-http-problem
   problem:

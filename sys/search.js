@@ -67,13 +67,47 @@ class Search {
         const emptyUri = this.requestURI(this.elastic_search);
 
         // Complete the uri with the search request
-        var j = {"query": { "match_all": {} }};
-        const searchUri = emptyUri + '/' + requestParams.index + '/_search?source_content_type=application/json&source='+ JSON.stringify(j);
+        var query = 
+            { "query" : 
+                { 
+                    "match_all": 
+                        {} 
+                }
+            };
+        const searchUri = emptyUri + '/' + requestParams.index + '/_search?source_content_type=application/json&source='+ JSON.stringify(query);
 
         // return Elasticsearch response (this needs modifications)
         return hyper.get({ uri: searchUri });
     }
+
+    rangeQuery(hyper,req) {
+        // Requests Elasticsearch with a range query 
+
+        var requestParams = req.params;
+
+        // Create an incomplete uri which points to Elasticsearch
+        const emptyUri = this.requestURI(this.elastic_search);
+
+    
+        var query = { 
+            "query" : { 
+                "range": {
+                    "timestamp": {
+                        "gte" : requestParams.from,
+                        "lte" : requestParams.to
+                    }
+                } 
+            }
+        };
+
+        const searchUri = emptyUri + '/' + requestParams.index + '/_search?source_content_type=application/json&source='+ JSON.stringify(query);
+
+        // return Elasticsearch response (this needs modifications)
+        return hyper.get({ uri: searchUri });
+    }
+
 }
+    
 
 module.exports = function(options) {
     var search = new Search(options);
@@ -81,7 +115,8 @@ module.exports = function(options) {
     return {
         spec: spec,
         operations: {
-            getAll: search.getAll.bind(search)
+            getAll: search.getAll.bind(search),
+            rangeQuery: search.rangeQuery.bind(search)
         }
     };
 };
