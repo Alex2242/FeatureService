@@ -1,0 +1,51 @@
+input:
+  # scheme could be local or hdfs
+  scheme: local
+  local:
+    # csv or json
+    path: data_examples/backend_output.json
+# hdfs:
+#   ip: 127.0.0.1
+#   port: 50070
+#   path: /fft.json
+
+
+output:
+  # scheme could be local, hdfs or elasticsearch
+  scheme: local
+  local:
+    # json
+    path: output_examples/backend.json
+# hdfs:
+#   ip: 127.0.0.1
+#   port: 50070
+#   path: /out.json
+# elasticsearch:
+#   host: 127.0.0.1
+#   port: 9200
+#   index: ebdo
+
+
+converters:
+  # inputName: Name of the value in the input file
+  # outputName: Name of the value in the output file
+  # inputType: Type of the value in input file
+  # outputType: Type of the value in output file
+  # defaultValue: Default value if value is empty in input file
+  # Rules:
+  #    - If a csv column name in source file does not exist in converters, an exception will be raised.
+  #    - Input and output types must be defined, even if the type is the same (explicit declaration)
+  #    - If defaultValue is set, an empty source value (length of str equals 0 or only spaces) will be filled by the default value.
+  #    - If defaultValue is NOT set (i.e. not present), an empty source value will raise an exception.
+
+  - inputName: "timestamp"
+    outputName: "timestamp"
+    inputType: "str"
+    outputType: "str"
+    defaultValue: "None"
+
+  - inputName: "TOB"
+    outputName: "TOB"
+    inputType: "list"
+    outputType: "list"
+    defaultValue: "None"

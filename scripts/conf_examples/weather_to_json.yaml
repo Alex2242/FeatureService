@@ -1,0 +1,76 @@
+input:
+  # scheme could be local or hdfs
+  scheme: local
+  local:
+    # csv or json
+    path: data_examples/WeatherBuoy_NOAA.csv
+# hdfs:
+#   ip: 127.0.0.1
+#   port: 50070
+#   path: /fft.json
+
+
+output:
+  # scheme could be local, hdfs or elasticsearch
+  scheme: local
+  local:
+    # json
+    path: output_examples/weather.json
+# hdfs:
+#   ip: 127.0.0.1
+#   port: 50070
+#   path: /out.json
+# elasticsearch:
+#   host: 127.0.0.1
+#   port: 9200
+#   index: ebdo
+
+
+converters:
+  # inputName: Name of the value in the input file
+  # outputName: Name of the value in the output file
+  # inputType: Type of the value in input file
+  # outputType: Type of the value in output file
+  # defaultValue: Default value if value is empty in input file
+  # Rules:
+  #    - If a csv column name in source file does not exist in converters, an exception will be raised.
+  #    - Input and output types must be defined, even if the type is the same (explicit declaration)
+  #    - If defaultValue is set, an empty source value (length of str equals 0 or only spaces) will be filled by the default value.
+  #    - If defaultValue is NOT set (i.e. not present), an empty source value will raise an exception.
+
+  - inputName: "Latitude"
+    outputName: "latitude"
+    inputType: "str"
+    outputType: "str"
+    defaultValue: "None"
+
+  - inputName: "Longitude"
+    outputName: "longitude"
+    inputType: "str"
+    outputType: "str"
+    defaultValue: "None"
+
+
+  - inputName: "Time of Observation"
+    outputName: "timestamp"
+    inputType: "str"
+    outputType: "str"
+    defaultValue: "None"
+
+  - inputName: "Wind Speed"
+    outputName: "wind_speed"
+    inputType: "str"
+    outputType: "int"
+    defaultValue: "None"
+
+  - inputName: "Wind Direction"
+    outputName: "wind_direction"
+    inputType: "str"
+    outputType: "int"
+    defaultValue: "None"
+
+  - inputName: "Sea Surface Temperature"
+    outputName: "sea_surface_temperature"
+    inputType: "str"
+    outputType: "float"
+    defaultValue: "None"
