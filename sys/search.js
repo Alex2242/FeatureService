@@ -57,7 +57,7 @@ class Search {
     }
 
 
-    emptySearch(hyper, req) {
+    getAll(hyper, req) {
         // Requests Elasticsearch with an empty search at a given index
         // ie : gets all documents at the given index
 
@@ -80,7 +80,7 @@ module.exports = function(options) {
     return {
         spec: spec,
         operations: {
-            emptySearch: search.emptySearch.bind(search)
+            getAll: search.getAll.bind(search)
         }
     };
 };

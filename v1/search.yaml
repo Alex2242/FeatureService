@@ -52,7 +52,7 @@ paths:
             $ref: '#/definitions/problem'
       x-monitor: false
 
-  /empty-search/{index}:
+  /get-all/{index}:
     get:
       tags:
         - EBDO FeatureService search
@@ -72,7 +72,7 @@ paths:
           description: The documents of the index.
           # the two lines that follows must be uncommented asap, ie define the form of the response
           #schema:
-          #  $ref: '#/definitions/empty-search'
+          #  $ref: '#/definitions/get-all'
         default:
           description: Error
           schema:
@@ -80,7 +80,7 @@ paths:
       x-request-handler:
         - get_from_backend:
             request:
-              uri: /{domain}/sys/search/empty-search/{index}
+              uri: /{domain}/sys/search/get-all/{index}
       x-monitor: false
 
 definitions:
