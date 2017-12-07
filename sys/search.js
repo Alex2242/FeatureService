@@ -56,46 +56,49 @@ class Search {
         }
     }
 
-    static esRequest(hyper,req,query,elastic_search) {
+    static esRequest(hyper,bodyReq,elastic_search,index="_all") {
         // Requests Elasticsearch with the given ES DSL query
-
-        var requestParams = req.params;
 
         // Create an incomplete uri which points to Elasticsearch
         const incompleteUri = Search.requestURI(elastic_search);
 
-        // Complete the uri with the DSL query
-        // if the request is made on all indices, pass _all as index
-        const searchUri = incompleteUri + '/' + requestParams.index +
-            '/_search?source_content_type=application/json&source='+ JSON.stringify(query);
+        // Complete the uri with the the index and the _search 
+        // if the request is made on all indices, use _all (default) as index
+        const esUri = incompleteUri + '/' + index + '/_search';
 
         // return Elasticsearch response (this needs modifications)
-        return hyper.get({ uri: searchUri }).catch( (e) => console.log(e) );
+        return hyper.get({ 
+                uri: esUri,
+                headers: { "Content-Type": "application/json"},
+                body: bodyReq }).
+            catch( (e) => console.log(e) );
     }
 
     getAll(hyper, req) {
         // Requests Elasticsearch with an empty search at a given index
         // ie : gets all documents at the given index
 
-        var query =
-            { "query" :
+        var requestParams = req.params;
+
+        var query = JSON.stringify({ 
+            "size" : 10000,
+            "query" :
                 {
                     "match_all":
                         {}
                 }
-            };
+            });
 
-        return Search.esRequest(hyper,req,query,this.elastic_search);
+        return Search.esRequest(hyper,query,this.elastic_search,requestParams.index);
     }
 
     rangeQuery(hyper,req) {
-        // Requests Elasticsearch with a range query on a index
-        // returns all documents whithin the range
+        // Requests Elasticsearch with a time based range query on a index
 
         var requestParams = req.params;
 
-        var query = {
-            "size": 100,
+        var query = JSON.stringify({
+            "size" : 10000,
             "query" : {
                 "range": {
                     "timestamp": {
@@ -107,9 +110,9 @@ class Search {
             "sort": [
                 { "timestamp" : {"order" : "asc"} }
             ]
-         };
+         });
 
-        return Search.esRequest(hyper,req,query,this.elastic_search);
+        return Search.esRequest(hyper,query,this.elastic_search,requestParams.index);
     }
 
 }
