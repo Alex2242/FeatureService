@@ -33,19 +33,28 @@ class Search {
 
     constructor(options) {
         this.options = options;
-        this.elastic_search = options.elastic_search;
+        this.elasticSearch = options.elasticSearch;
 
     }
 
-    static requestURI(elastic_search) {
+    static requestURI(elasticSearch) {
         // Generate an incomplete uri that points to Elasticsearch
-        if (elastic_search) {
-            const scheme = (elastic_search.scheme) ? `${elastic_search.scheme}://` : '';
-            const host = elastic_search.host || '';
-            const port = (elastic_search.port) ? `:${elastic_search.port}` : '';
+        if (elasticSearch) {
+            const scheme = (elasticSearch.scheme) ? `${elasticSearch.scheme}://` : '';
+            const host = elasticSearch.host || '';
+            const port = (elasticSearch.port) ? `:${elasticSearch.port}` : '';
+            const path = elasticSearch.path || '';
 
+            return `${scheme}${host}${port}${path}`;
+            /*
+            // Path completes es uri to point towards sys/fake-es when test are ran
+            if (typeof elasticSearch.path !== 'undefined') {
+                const path = elasticSearch.path || '';
+                return path;
+            }
             return `${scheme}${host}${port}`;
-        } else { // Fail with 500 if elastic_search conf is not set
+            */
+        } else { // Fail with 500 if elasticSearch conf is not set
             throw new HTTPError({
                 status: 500,
                 body: {
@@ -56,63 +65,64 @@ class Search {
         }
     }
 
-    static esRequest(hyper,bodyReq,elastic_search,index="_all") {
-        // Requests Elasticsearch with the given ES DSL query
-
-        // Create an incomplete uri which points to Elasticsearch
-        const incompleteUri = Search.requestURI(elastic_search);
-
-        // Complete the uri with the the index and the _search 
-        // if the request is made on all indices, use _all (default) as index
-        const esUri = incompleteUri + '/' + index + '/_search';
-
-        // return Elasticsearch response (this needs modifications)
-        return hyper.get({ 
-                uri: esUri,
-                headers: { "Content-Type": "application/json"},
-                body: bodyReq }).
-            catch( (e) => console.log(e) );
-    }
 
     getAll(hyper, req) {
         // Requests Elasticsearch with an empty search at a given index
-        // ie : gets all documents at the given index
+        // ie: gets all documents at the given index
 
         var requestParams = req.params;
+        const incompleteUri = Search.requestURI(this.elasticSearch);
+        const esUri = incompleteUri + '/' + requestParams.index + '/_search';
 
-        var query = JSON.stringify({ 
-            "size" : 10000,
-            "query" :
-                {
-                    "match_all":
-                        {}
+        var query = JSON.stringify({
+            size: 10000,
+            query: {
+                    match_all: {}
                 }
-            });
+        });
 
-        return Search.esRequest(hyper,query,this.elastic_search,requestParams.index);
+        return hyper.get({
+                            uri: esUri,
+                            headers: { "Content-Type": "application/json" },
+                            body: query })
+            .then((res) => {
+                            res.body = { items: res.body.hits.hits.map((hit) => hit._source) };
+                            return res;
+                        })
+            .catch((err) => err);
     }
 
     rangeQuery(hyper,req) {
         // Requests Elasticsearch with a time based range query on a index
 
         var requestParams = req.params;
+        const incompleteUri = Search.requestURI(this.elasticSearch);
+        const esUri = incompleteUri + '/' + requestParams.index + '/_search';
 
         var query = JSON.stringify({
-            "size" : 10000,
-            "query" : {
-                "range": {
-                    "timestamp": {
-                         "gte" : requestParams.from,
-                         "lt" : requestParams.to
+            size: 10000,
+            query: {
+                range: {
+                    timestamp: {
+                        gte: requestParams.from,
+                        lt: requestParams.to
                     }
                 }
             },
-            "sort": [
-                { "timestamp" : {"order" : "asc"} }
+            sort: [
+                { timestamp: { order: "asc" } }
             ]
-         });
+        });
 
-        return Search.esRequest(hyper,query,this.elastic_search,requestParams.index);
+        return hyper.get({
+                            uri: esUri,
+                            headers: { "Content-Type": "application/json" },
+                            body: query })
+            .then((res) => {
+                            res.body = { items: res.body.hits.hits.map((hit) => hit._source) };
+                            return res;
+                        })
+            .catch((err) => err);
     }
 
 }
