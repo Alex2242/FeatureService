@@ -69,7 +69,6 @@ class Search {
     getAll(hyper, req) {
         // Requests Elasticsearch with an empty search at a given index
         // ie: gets all documents at the given index
-
         var requestParams = req.params;
         const incompleteUri = Search.requestURI(this.elasticSearch);
         const esUri = incompleteUri + '/' + requestParams.index + '/_search';
