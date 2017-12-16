@@ -22,7 +22,7 @@ feature_service_project: &feature_service_project
   x-modules:
     - path: projects/feature_service_default.yaml
       options: &default_options
-        elastic_search:
+        elasticSearch:
           scheme: http
           host: localhost
           port: 9200

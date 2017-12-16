@@ -63,7 +63,7 @@ class Example {
             body: {
                 items: [...Array(stepNumbers).keys()].map(idx => {
                     return {
-                        ts: (new Date(fromDate.getTime() +
+                        timestamp: (new Date(fromDate.getTime() +
                             (idx * stepSeconds * 1000))).toISOString(),
                         val: Math.random()
                     };

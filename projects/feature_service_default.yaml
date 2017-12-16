@@ -48,5 +48,5 @@ paths:
               x-modules:
                 - path: sys/search.js
                   options:
-                    elastic_search: '{{options.elastic_search}}'
+                    elasticSearch: '{{options.elasticSearch}}'
         options: '{{options}}'

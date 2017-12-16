@@ -33,19 +33,19 @@ class Search {
 
     constructor(options) {
         this.options = options;
-        this.elastic_search = options.elastic_search;
-
+        this.elasticSearch = options.elasticSearch;
     }
 
-    requestURI(elastic_search) {
+    static requestURI(elasticSearch) {
         // Generate an incomplete uri that points to Elasticsearch
-        if (elastic_search) {
-            const scheme = (elastic_search.scheme) ? `${elastic_search.scheme}://` : '';
-            const host = elastic_search.host || '';
-            const port = (elastic_search.port) ? `:${elastic_search.port}` : '';
+        if (elasticSearch) {
+            const scheme = (elasticSearch.scheme) ? `${elasticSearch.scheme}://` : '';
+            const host = elasticSearch.host || '';
+            const port = (elasticSearch.port) ? `:${elasticSearch.port}` : '';
+            const path = elasticSearch.path || '';
 
-            return `${scheme}${host}${port}`;
-        } else { // Fail with 500 if elastic_search conf is not set
+            return `${scheme}${host}${port}${path}`;
+        } else { // Fail with 500 if elasticSearch conf is not set
             throw new HTTPError({
                 status: 500,
                 body: {
@@ -59,20 +59,64 @@ class Search {
 
     getAll(hyper, req) {
         // Requests Elasticsearch with an empty search at a given index
-        // ie : gets all documents at the given index
+        // ie: gets all documents at the given index
+        var requestParams = req.params;
+        const incompleteUri = Search.requestURI(this.elasticSearch);
+        const esUri = incompleteUri + '/' + requestParams.index + '/_search';
+
+        var query = JSON.stringify({
+            size: 10000,
+            query: {
+                    match_all: {}
+                }
+        });
+
+        return hyper.get({
+                            uri: esUri,
+                            headers: { "Content-Type": "application/json" },
+                            body: query })
+            .then((res) => {
+                            res.body = { items: res.body.hits.hits.map((hit) => hit._source) };
+                            return res;
+                        })
+            .catch((err) => err);
+    }
+
+    rangeQuery(hyper,req) {
+        // Requests Elasticsearch with a time based range query on a index
 
         var requestParams = req.params;
+        const incompleteUri = Search.requestURI(this.elasticSearch);
+        const esUri = incompleteUri + '/' + requestParams.index + '/_search';
 
-        // Create an incomplete uri which points to Elasticsearch
-        const emptyUri = this.requestURI(this.elastic_search);
+        var query = JSON.stringify({
+            size: 10000,
+            query: {
+                range: {
+                    timestamp: {
+                        gte: requestParams.from,
+                        lt: requestParams.to
+                    }
+                }
+            },
+            sort: [
+                { timestamp: { order: "asc" } }
+            ]
+        });
 
-        // Complete the uri with the search request
-        const searchUri = emptyUri + '/' + requestParams.index + '/_search';
-
-        // return Elasticsearch response (this needs modifications)
-        return hyper.get({ uri: searchUri });
+        return hyper.get({
+                            uri: esUri,
+                            headers: { "Content-Type": "application/json" },
+                            body: query })
+            .then((res) => {
+                            res.body = { items: res.body.hits.hits.map((hit) => hit._source) };
+                            return res;
+                        })
+            .catch((err) => err);
     }
+
 }
+
 
 module.exports = function(options) {
     var search = new Search(options);
@@ -80,7 +124,8 @@ module.exports = function(options) {
     return {
         spec: spec,
         operations: {
-            getAll: search.getAll.bind(search)
+            getAll: search.getAll.bind(search),
+            rangeQuery: search.rangeQuery.bind(search)
         }
     };
 };

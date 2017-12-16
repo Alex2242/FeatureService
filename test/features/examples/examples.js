@@ -50,8 +50,8 @@ describe('examples endpoints', function () {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.body.items.length, 31);
             // checking first and last timestamps
-            assert.deepStrictEqual(res.body.items[0].ts, '2017-01-01T00:00:00.000Z');
-            assert.deepStrictEqual(res.body.items[30].ts, '2017-01-31T00:00:00.000Z');
+            assert.deepStrictEqual(res.body.items[0].timestamp, '2017-01-01T00:00:00.000Z');
+            assert.deepStrictEqual(res.body.items[30].timestamp, '2017-01-31T00:00:00.000Z');
 
         });
     });
@@ -63,8 +63,8 @@ describe('examples endpoints', function () {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.body.items.length, 24);
             // checking first and last timestamps
-            assert.deepStrictEqual(res.body.items[0].ts, '2017-01-01T00:00:00.000Z');
-            assert.deepStrictEqual(res.body.items[23].ts, '2017-01-01T23:00:00.000Z');
+            assert.deepStrictEqual(res.body.items[0].timestamp, '2017-01-01T00:00:00.000Z');
+            assert.deepStrictEqual(res.body.items[23].timestamp, '2017-01-01T23:00:00.000Z');
         });
     });
 
@@ -75,8 +75,8 @@ describe('examples endpoints', function () {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.body.items.length, 60);
             // checking first and last timestamps
-            assert.deepStrictEqual(res.body.items[0].ts, '2017-01-01T00:00:00.000Z');
-            assert.deepStrictEqual(res.body.items[59].ts, '2017-01-01T00:59:00.000Z');
+            assert.deepStrictEqual(res.body.items[0].timestamp, '2017-01-01T00:00:00.000Z');
+            assert.deepStrictEqual(res.body.items[59].timestamp, '2017-01-01T00:59:00.000Z');
         });
     });
 
@@ -87,8 +87,8 @@ describe('examples endpoints', function () {
             assert.deepEqual(res.status, 200);
             assert.deepEqual(res.body.items.length, 60);
             // checking first and last timestamps
-            assert.deepStrictEqual(res.body.items[0].ts, '2017-01-01T00:00:00.000Z');
-            assert.deepStrictEqual(res.body.items[59].ts, '2017-01-01T00:00:59.000Z');
+            assert.deepStrictEqual(res.body.items[0].timestamp, '2017-01-01T00:00:00.000Z');
+            assert.deepStrictEqual(res.body.items[59].timestamp, '2017-01-01T00:00:59.000Z');
         });
     });
 
