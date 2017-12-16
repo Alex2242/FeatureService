@@ -9,21 +9,18 @@
 var HyperSwitch = require('hyperswitch');
 var path = require('path');
 var assert = require('../../utils/assert.js');
-
 var fixtures = require('./fixtures.js');
-
-
 var spec = HyperSwitch.utils.loadSpec(path.join(__dirname, 'fake-es.yaml'));
 
-// FES service
+// FakeElasticSearch service
 function FES(options) {
     this.options = options;
 }
 
+// Endpoint that receives all requests that are supposed to go to ES.
 FES.prototype.query = function(hyper, req) {
-
     var body = req.body;
-    var headers = req.headers;
+    var headers = req.headers; // headers are forwarded (for application/json)
     var index = req.params.index;
     var method = req.params.method;
 
@@ -41,8 +38,11 @@ FES.prototype.query = function(hyper, req) {
             body: foundValue[0].esResult
         };
     } else {
-        /* console.error('fake_ES couldn\'t find an expected matching ES query:\n'
-            +'Received: ' + JSON.stringify(body)); */
+        /*
+         * Mute errors for they occurs even when test are supposed to fail
+        console.error('FakeElasticSearch couldn\'t find an expected matching ES query:\n'
+            +'Received: ' + JSON.stringify(body));
+        */
         return { status: 404 };
     }
 };

@@ -1,5 +1,10 @@
+/*
+ * EBDO-FeatureService fixtures used to test ES endpoints
+ * Author:
+ *
+ * fs stands for FeatureService
+ */
 
-// fs stands for FeatureService
 
 
 
@@ -7,7 +12,7 @@
                         fixtures utils functions
 *****************************************************************************/
 
-var makeErrorFixture = function(describe, FSEndpoint) {
+const makeErrorFixture = function(describe, FSEndpoint) {
   return {
       describe: describe,
       FSEndpoint: FSEndpoint,
@@ -17,8 +22,15 @@ var makeErrorFixture = function(describe, FSEndpoint) {
   };
 }
 
-var fakeTimeserie = function(from,steps,stepDuration) {
-    var fromDate = new Date(from);
+
+const fakeTimeserie = function(from,steps,stepDuration) {
+    /* Generates a sample timeserie filled with random values
+    Parameters:
+        - from: start date of the timeserie, format:  ISO 8601 (YYYY-MM-DDTHH:mm:ss.sssZ)
+        - steps: length of the timeserie (int)
+        - stepDuration: time in seconds that seperates 2 consecutive values.
+    */
+    const fromDate = new Date(from);
     return { items: [...Array(steps).keys()].map(idx => {
             return {
                 timestamp: (new Date(fromDate.getTime() +
@@ -29,10 +41,10 @@ var fakeTimeserie = function(from,steps,stepDuration) {
     }
 }
 
-var makeid = function () {
+const makeid = function () {
+    // Generates a fake elasticsearch id
     var id = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     for (var i = 0; i < 16; i++)
         id += possible.charAt(Math.floor(Math.random() * possible.length));
 
@@ -40,6 +52,12 @@ var makeid = function () {
 }
 
 var fakeTimeserieTob = function(from,steps,stepDuration) {
+    /* Generates a sample timeserie filled with arrays of random values
+    Parameters:
+        - from: start date of the timeserie, format:  ISO 8601 (YYYY-MM-DDTHH:mm:ss.sssZ)
+        - steps: length of the timeserie (int)
+        - stepDuration: time in seconds that seperates 2 consecutive values.
+    */
     var fromDate = new Date(from);
     return { items: [...Array(steps).keys()].map(idx => {
             return {
@@ -51,7 +69,14 @@ var fakeTimeserieTob = function(from,steps,stepDuration) {
     }
 }
 
-var fakeEsResponse = function(timeSerie,esIndex) {
+const fakeEsResponse = function(timeSerie,esIndex) {
+    /* Generates a standard Elasticsearch response filled with the given timeserie.
+    Parameters:
+        - timeSerie: Object in which items is an array that contains each value of the timeserie
+        - esIndex: string, the index where the timeserie is supposed to be stored
+    */
+
+    // standard ES response scheme, incomplete though
     var esRes = {
         "took" : 5,
         "timed_out" : false,
@@ -69,11 +94,12 @@ var fakeEsResponse = function(timeSerie,esIndex) {
         }
     };
 
+    // fills the response with the elements of timeSerie
     timeSerie.items.forEach(function(tsItem, index, array) {
         var hit = {
             "_index" : esIndex,
             "_type" : "data",
-            "_id" : makeid(),
+            "_id" : makeid(), // random id is put for each documents
             "_score" : 1.0,
             "_source" : {
                 "timestamp" : tsItem.timestamp,
@@ -81,19 +107,16 @@ var fakeEsResponse = function(timeSerie,esIndex) {
             }
         };
         esRes.hits.hits.push(hit);
-
-
     });
 
     return esRes;
-
 }
 
 /******************************************************************************
                             fixtures
 *****************************************************************************/
 
-var getAllFixtures = [
+const getAllFixtures = [
 
     {
         describe: 'return 200 and results for get-all with sample ts',
@@ -106,7 +129,7 @@ var getAllFixtures = [
 
 ]
 
-var rangeQueryFixtures = [
+const rangeQueryFixtures = [
     {
         describe: 'return 200 and results for get-all with sample ts',
         fsEndpoint: '/data.ebdo.org/v1/search/get-all',

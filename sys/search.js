@@ -34,7 +34,6 @@ class Search {
     constructor(options) {
         this.options = options;
         this.elasticSearch = options.elasticSearch;
-
     }
 
     static requestURI(elasticSearch) {
@@ -46,14 +45,6 @@ class Search {
             const path = elasticSearch.path || '';
 
             return `${scheme}${host}${port}${path}`;
-            /*
-            // Path completes es uri to point towards sys/fake-es when test are ran
-            if (typeof elasticSearch.path !== 'undefined') {
-                const path = elasticSearch.path || '';
-                return path;
-            }
-            return `${scheme}${host}${port}`;
-            */
         } else { // Fail with 500 if elasticSearch conf is not set
             throw new HTTPError({
                 status: 500,

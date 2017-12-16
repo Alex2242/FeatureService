@@ -20,8 +20,8 @@ describe('search endpoints', function () {
 
     it('should return 404 when index doesnt exist ', function () {
         return preq.get({
-            uri: server.config.fsURL + endpoint + "/wrongIndex"
-        }).catch(function(res) {
+            uri: server.config.fsURL + endpoint + "/wrongIndex"}).
+        catch(function(res) {
             assert.deepEqual(res.status, 404);
         });
     });
