@@ -59,6 +59,7 @@ class Sound {
             status: 200,
             headers: {
                 'content-type': 'audio/x-wav',
+                'Access-Control-Allow-Origin': 'localhost',
                 'content-length': stat.size
             },
             body: fileSystem.createReadStream(filePath)
