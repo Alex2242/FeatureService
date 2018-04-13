@@ -25,6 +25,7 @@ var HyperSwitch = require('hyperswitch');
 var path = require('path');
 var fileSystem = require('fs');
 const HTTPError = HyperSwitch.HTTPError;
+var fsUtil = require('../lib/FeatureServiceUtil');
 
 var spec = HyperSwitch.utils.loadSpec(path.join(__dirname, 'sound.yaml'));
 
@@ -54,7 +55,7 @@ class Sound {
 
         var stat = fileSystem.statSync(filePath);
 
-        var response = {
+        return {
             status: 200,
             headers: {
                 'content-type': 'audio/x-wav',
@@ -62,8 +63,6 @@ class Sound {
             },
             body: fileSystem.createReadStream(filePath)
         };
-
-        return response;
     }
 
     listSound() {
@@ -72,12 +71,10 @@ class Sound {
 
         var files = fileSystem.readdirSync(dirPath);
 
-        var response = {
+        return fsUtil.normalizeResponse({
             status: 200,
             body: files
-        };
-
-        return response;
+        });
     }
 }
 
